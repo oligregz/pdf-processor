@@ -1,0 +1,113 @@
+# GLOBAL
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# ENV FILES
+.env
+.env.*
+!.env.example
+
+# NODE / TYPESCRIPT (NestJS + Angular)
+node_modules/
+dist/
+build/
+coverage/
+.tmp/
+.temp/
+.cache/
+
+# TypeScript
+*.tsbuildinfo
+
+# ANGULAR
+.angular/cache
+.angular
+
+# JAVA / SPRING BOOT
+# Maven
+target/
+
+# Gradle
+.gradle/
+build/
+
+# Java compiled files
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE
+# VSCode
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# IntelliJ / JetBrains
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# DOCKER
+docker-data/
+*.pid
+
+# DATABASE
+*.sqlite
+*.db
+*.db-journal
+
+# TEST
+coverage/
+.nyc_output/
+
+# CACHE
+.cache/
+.eslintcache
+
+# TEMP
+tmp/
+temp/
+
+# GEMINI CLI
+# Gemini local config
+.gemini/
+
+# Gemini prompts, sessions or temp outputs
+.gemini-cache/
+.gemini-tmp/
+
+# Gemini credentials (safety)
+gemini.key
+gemini.json
+gemini.config.json
+
+
+# AI / LLM TOOLS (optional but recommended)
+# General AI tooling artifacts
+.ai/
+.llm/
+.prompts-cache/
+.prompt-cache/
+
+# Local AI scripts outputs
+ai-output/

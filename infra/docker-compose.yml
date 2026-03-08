@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - POSTGRES_URL=postgres://user:pass@postgres:5432/queue_db
+      - MONGO_URL=mongodb://user:pass@mongodb:27017/logs_db
+      - RABBITMQ_URL=amqp://user:pass@rabbitmq:5672
+      - CLOUDFLARE_R2_ACCESS_KEY=${R2_ACCESS_KEY}
+      - CLOUDFLARE_R2_SECRET_KEY=${R2_SECRET_KEY}
+    networks:
+      - public_net
+      - internal_backend_net
+    depends_on:
+      - postgres
+      - mongodb
+      - rabbitmq
+
+  pdf-worker:
+    build: ./pdf-worker
+    container_name: pdf-worker
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - POSTGRES_URL=jdbc:postgresql://postgres:5432/queue_db
+      - MONGO_URL=mongodb://user:pass@mongodb:27017/logs_db
+      - RABBITMQ_HOST=rabbitmq
+      - CLOUDFLARE_R2_ACCESS_KEY=${R2_ACCESS_KEY}
+      - CLOUDFLARE_R2_SECRET_KEY=${R2_SECRET_KEY}
+      - SMTP_USER=${GMAIL_USER}
+      - SMTP_PASS=${GMAIL_APP_PASS}
+    networks:
+      - internal_backend_net
+    depends_on:
+      - postgres
+      - mongodb
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=pass
+    networks:
+      - internal_backend_net
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=queue_db
+    networks:
+      - internal_backend_net
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  mongodb:
+    image: mongo:6-jammy
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+    networks:
+      - internal_backend_net
+    volumes:
+      - mongodb_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+
+networks:
+  public_net:
+    driver: bridge
+  internal_backend_net:
+    driver: bridge
+    internal: true
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  rabbitmq_data:
