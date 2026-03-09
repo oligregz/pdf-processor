@@ -1,96 +1,19 @@
-import {
-  IsNumber,
-  IsString,
-  IsUrl,
-  Matches,
-  Min,
-  Max,
-} from 'class-validator';
-import { Type } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
+import { validateSync } from 'class-validator';
+import { EnvironmentVariables } from 'src/common/dtos/env.dto';
 
-export class EnvironmentVariables {
-  @IsNumber()
-  @Type(() => Number)
-  @Min(1)
-  @Max(65535)
-  PORT: number;
+export function validate(config: Record<string, unknown>) {
+  const validatedConfig = plainToInstance(EnvironmentVariables, config, {
+    enableImplicitConversion: true,
+  });
 
-  @IsString()
-  POSTGRES_HOST: string;
+  const errors = validateSync(validatedConfig, {
+    skipMissingProperties: false,
+  });
 
-  @IsNumber()
-  @Type(() => Number)
-  @Min(1)
-  @Max(65535)
-  POSTGRES_PORT: number;
+  if (errors.length > 0) {
+    throw new Error(errors.toString());
+  }
 
-  @IsString()
-  POSTGRES_USER: string;
-
-  @IsString()
-  POSTGRES_PASSWORD: string;
-
-  @IsString()
-  POSTGRES_DB: string;
-
-  @IsUrl({
-    require_tld: false,
-  })
-  POSTGRES_URL: string;
-
-  @IsString()
-  MONGO_HOST: string;
-
-  @IsNumber()
-  @Type(() => Number)
-  @Min(1)
-  @Max(65535)
-  MONGO_PORT: number;
-
-  @IsString()
-  MONGO_USER: string;
-
-  @IsString()
-  MONGO_PASSWORD: string;
-
-  @IsString()
-  MONGO_DB: string;
-
-  @IsString()
-  MONGO_AUTH_SOURCE: string;
-
-  @IsUrl({
-    require_tld: false,
-  })
-  MONGO_URL: string;
-
-  @IsString()
-  RABBITMQ_HOST: string;
-
-  @IsNumber()
-  @Type(() => Number)
-  @Min(1)
-  @Max(65535)
-  RABBITMQ_PORT: number;
-
-  @IsString()
-  RABBITMQ_USER: string;
-
-  @IsString()
-  RABBITMQ_PASSWORD: string;
-
-  @IsUrl({
-    require_tld: false,
-  })
-  RABBITMQ_URL: string;
-
-  @IsString()
-  JWT_SECRET: string;
-
-  @IsString()
-  @Matches(/^\d+[smhd]$/, {
-    message:
-      'EXPIRATION_TIME_TO_LIVE must follow pattern like 15m, 10s, 2h, 7d',
-  })
-  EXPIRATION_TIME_TO_LIVE: string;
+  return validatedConfig;
 }
