@@ -35,7 +35,7 @@ export class EnvironmentVariables {
 
   @IsUrl({
     require_tld: false,
-  	protocols: ['postgres'],
+  	protocols: ['postgres', 'postgresql'],
   })
   POSTGRES_URL: string;
 
@@ -62,7 +62,7 @@ export class EnvironmentVariables {
 
   @IsUrl({
     require_tld: false,
-		protocols: ['mongodb'],
+		protocols: ['mongodb', 'mongodb+srv'],
   })
   MONGO_URL: string;
 
@@ -83,7 +83,7 @@ export class EnvironmentVariables {
 
   @IsUrl({
     require_tld: false,
-		protocols: ['amqp'],
+		protocols: ['amqp', 'amqps'],
   })
   RABBITMQ_URL: string;
 
