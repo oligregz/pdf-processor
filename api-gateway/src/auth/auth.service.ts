@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { User } from './entities/user.entity';
 import { RateLimit } from './schemas/rate-limit.schema';
+import { RateLimitActionEnum } from 'src/common/enums/rate-limit-action.enum';
 
 @Injectable()
 export class AuthService {
@@ -35,7 +36,7 @@ export class AuthService {
 
     await this.rateLimitModel.create({
       userId: user.id,
-      action: 'SESSION_ACTIVE',
+      action: RateLimitActionEnum.SESSION_ACTIVE,
       expireAt: expireAt,
     });
 
