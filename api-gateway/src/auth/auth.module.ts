@@ -9,6 +9,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { User } from './entities/user.entity';
 import { RateLimit, RateLimitSchema } from './schemas/rate-limit.schema';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { RateLimit, RateLimitSchema } from './schemas/rate-limit.schema';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy],
   exports: [TypeOrmModule, MongooseModule, JwtModule],
 })
 export class AuthModule {}
