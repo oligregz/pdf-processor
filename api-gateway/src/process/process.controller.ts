@@ -18,7 +18,7 @@ export class ProcessController {
     const userId = req.user.userId;
 
     return {
-      message: 'Upload autorizado com sucesso!',
+      message: 'Upload successfuly!',
       userId: userId,
       fileName: file.originalname,
       fileSize: file.size,
