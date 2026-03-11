@@ -10,6 +10,7 @@ import { RateLimit } from '../auth/schemas/rate-limit.schema';
 import { ProcessStatusEnum } from '../common/enums/process-status.enum';
 import { RateLimitActionEnum } from '../common/enums/rate-limit-action.enum';
 import { StorageService } from '../storage/storage.service';
+import { QueueService } from 'src/queue/queue.service';
 
 @Injectable()
 export class ProcessService {
@@ -22,7 +23,8 @@ export class ProcessService {
     @InjectModel(RateLimit.name)
     private readonly rateLimitModel: Model<RateLimit>,
     private readonly storageService: StorageService,
-  ) {}
+    private readonly queueService: QueueService,
+  ) { }
 
   async processPdfUpload(userId: string, file: Express.Multer.File) {
     await this.validateRateLimit(userId);
@@ -43,6 +45,12 @@ export class ProcessService {
     });
 
     this.logAcceptedUpload(userId, storagePath, correlationId);
+
+    this.queueService.publishPdfUploadedEvent({
+      correlationId,
+      userId,
+      storagePath,
+    });
 
     return this.buildResponse(processHistory, correlationId);
   }
@@ -69,7 +77,7 @@ export class ProcessService {
   private async uploadToCloud(file: Express.Multer.File, correlationId: string): Promise<string> {
     const fileExtension = file.originalname.split('.').pop();
     const uniqueFileName = `${correlationId}.${fileExtension}`;
-    
+
     try {
       return await this.storageService.uploadPdf(file.buffer, uniqueFileName);
     } catch (error) {

@@ -8,6 +8,7 @@ import { QueueState } from './entities/queue-state.entity';
 import { ErrorLog, ErrorLogSchema } from './schemas/error-log.schema';
 import { StorageModule } from 'src/storage/storage.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { QueueModule } from 'src/queue/queue.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthModule } from 'src/auth/auth.module';
     MongooseModule.forFeature([{ name: ErrorLog.name, schema: ErrorLogSchema }]),
     AuthModule,
     StorageModule,
+    QueueModule,
   ],
   providers: [ProcessService],
   controllers: [ProcessController],
