@@ -6,7 +6,7 @@ import { PdfValidationPipe } from './pipes/pdf-validation.pipe';
 
 @Controller('process')
 export class ProcessController {
-  constructor(private readonly processService: ProcessService) {}
+  constructor(private readonly processService: ProcessService) { }
 
   @Post('upload')
   @UseGuards(JwtAuthGuard)
@@ -17,11 +17,6 @@ export class ProcessController {
   ) {
     const userId = req.user.userId;
 
-    return {
-      message: 'Upload successfuly!',
-      userId: userId,
-      fileName: file.originalname,
-      fileSize: file.size,
-    };
+    return await this.processService.processPdfUpload(userId, file);
   }
 }
