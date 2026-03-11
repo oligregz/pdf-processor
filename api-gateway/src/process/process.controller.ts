@@ -1,4 +1,27 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Post, UseGuards, UseInterceptors, UploadedFile, Req } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ProcessService } from './process.service';
+import { PdfValidationPipe } from './pipes/pdf-validation.pipe';
 
 @Controller('process')
-export class ProcessController {}
+export class ProcessController {
+  constructor(private readonly processService: ProcessService) {}
+
+  @Post('upload')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadPdf(
+    @UploadedFile(PdfValidationPipe) file: Express.Multer.File,
+    @Req() req: any,
+  ) {
+    const userId = req.user.userId;
+
+    return {
+      message: 'Upload successfuly!',
+      userId: userId,
+      fileName: file.originalname,
+      fileSize: file.size,
+    };
+  }
+}
