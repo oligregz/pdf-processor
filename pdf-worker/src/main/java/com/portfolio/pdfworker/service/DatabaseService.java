@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.portfolio.pdfworker.model.ErrorLog;
 import com.portfolio.pdfworker.model.ProcessHistory;
 import com.portfolio.pdfworker.model.ProcessStatusEnum;
-import com.portfolio.pdfworker.repository.ErrorLogRepository;
-import com.portfolio.pdfworker.repository.ProcessHistoryRepository;
+import com.portfolio.pdfworker.repository.jpa.ProcessHistoryRepository;
+import com.portfolio.pdfworker.repository.mongo.ErrorLogRepository;
 
 @Service
 public class DatabaseService {
