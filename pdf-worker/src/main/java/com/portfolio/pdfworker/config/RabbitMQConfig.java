@@ -10,16 +10,10 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.portfolio.pdfworker.messaging.RabbitMQConstants;
+
 @Configuration
 public class RabbitMQConfig {
-
-	public static final String MAIN_QUEUE = "pdf.process.queue";
-	public static final String MAIN_EXCHANGE = "pdf.exchange";
-	public static final String ROUTING_KEY = "pdf.uploaded";
-
-	public static final String WAIT_QUEUE = "pdf.wait.queue";
-
-	public static final String DEAD_LETTER_QUEUE = "pdf.dlq.queue";
 
 	@Bean
 	public MessageConverter jsonMessageConverter() {
@@ -28,43 +22,64 @@ public class RabbitMQConfig {
 
 	@Bean
 	public DirectExchange mainExchange() {
-		return new DirectExchange(MAIN_EXCHANGE);
+		return new DirectExchange(RabbitMQConstants.Exchange.PDF);
 	}
 
 	@Bean
 	public Queue mainQueue() {
-		return QueueBuilder.durable(MAIN_QUEUE)
-				.withArgument("x-dead-letter-exchange", MAIN_EXCHANGE)
-				.withArgument("x-dead-letter-routing-key", "pdf.wait")
+		return QueueBuilder.durable(RabbitMQConstants.Queues.PROCESS)
+				.withArgument(
+						RabbitMQConstants.Arguments.DEAD_LETTER_EXCHANGE,
+						RabbitMQConstants.Exchange.PDF)
+				.withArgument(
+						RabbitMQConstants.Arguments.DEAD_LETTER_ROUTING_KEY,
+						RabbitMQConstants.Routing.WAIT)
 				.build();
 	}
 
 	@Bean
 	public Binding mainBinding() {
-		return BindingBuilder.bind(mainQueue()).to(mainExchange()).with(ROUTING_KEY);
+		return BindingBuilder
+				.bind(mainQueue())
+				.to(mainExchange())
+				.with(RabbitMQConstants.Routing.UPLOADED);
 	}
 
 	@Bean
 	public Queue waitQueue() {
-		return QueueBuilder.durable(WAIT_QUEUE)
-				.withArgument("x-dead-letter-exchange", MAIN_EXCHANGE)
-				.withArgument("x-dead-letter-routing-key", ROUTING_KEY)
-				.withArgument("x-message-ttl", 5000)
+		return QueueBuilder.durable(RabbitMQConstants.Queues.WAIT)
+				.withArgument(
+						RabbitMQConstants.Arguments.DEAD_LETTER_EXCHANGE,
+						RabbitMQConstants.Exchange.PDF)
+				.withArgument(
+						RabbitMQConstants.Arguments.DEAD_LETTER_ROUTING_KEY,
+						RabbitMQConstants.Routing.UPLOADED)
+				.withArgument(
+						RabbitMQConstants.Arguments.MESSAGE_TTL,
+						5000)
 				.build();
 	}
 
 	@Bean
 	public Binding waitBinding() {
-		return BindingBuilder.bind(waitQueue()).to(mainExchange()).with("pdf.wait");
+		return BindingBuilder
+				.bind(waitQueue())
+				.to(mainExchange())
+				.with(RabbitMQConstants.Routing.WAIT);
 	}
 
 	@Bean
 	public Queue deadLetterQueue() {
-		return QueueBuilder.durable(DEAD_LETTER_QUEUE).build();
+		return QueueBuilder
+				.durable(RabbitMQConstants.Queues.DLQ)
+				.build();
 	}
 
 	@Bean
 	public Binding deadLetterBinding() {
-		return BindingBuilder.bind(deadLetterQueue()).to(mainExchange()).with("pdf.dlq");
+		return BindingBuilder
+				.bind(deadLetterQueue())
+				.to(mainExchange())
+				.with(RabbitMQConstants.Routing.DLQ);
 	}
 }
