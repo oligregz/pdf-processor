@@ -25,6 +25,10 @@ spring:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USER:admin}
     password: ${RABBITMQ_PASSWORD:admin123}
+    listener:
+      simple:
+        acknowledge-mode: manual
+        default-requeue-rejected: false
 
 cloudflare:
   r2:
