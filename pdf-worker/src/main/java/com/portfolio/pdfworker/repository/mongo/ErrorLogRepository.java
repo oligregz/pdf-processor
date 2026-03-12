@@ -1,4 +1,4 @@
-package com.portfolio.pdfworker.repository;
+package com.portfolio.pdfworker.repository.mongo;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

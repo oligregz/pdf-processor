@@ -1,4 +1,4 @@
-package com.portfolio.pdfworker.repository;
+package com.portfolio.pdfworker.repository.jpa;
 
 import java.util.Optional;
 import java.util.UUID;
