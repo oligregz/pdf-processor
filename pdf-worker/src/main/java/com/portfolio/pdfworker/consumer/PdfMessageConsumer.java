@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import com.portfolio.pdfworker.dto.PdfUploadedEvent;
 import com.portfolio.pdfworker.messaging.RabbitMQConstants;
+import com.portfolio.pdfworker.service.PdfProcessorService; // <-- Importação do Serviço
 import com.rabbitmq.client.Channel;
 
 @Component
@@ -24,9 +25,11 @@ public class PdfMessageConsumer {
 	private static final int MAX_RETRIES = 3;
 
 	private final RabbitTemplate rabbitTemplate;
+	private final PdfProcessorService pdfProcessorService; // <-- Dependência adicionada
 
-	public PdfMessageConsumer(RabbitTemplate rabbitTemplate) {
+	public PdfMessageConsumer(RabbitTemplate rabbitTemplate, PdfProcessorService pdfProcessorService) {
 		this.rabbitTemplate = rabbitTemplate;
+		this.pdfProcessorService = pdfProcessorService;
 	}
 
 	@RabbitListener(queues = RabbitMQConstants.Queues.PROCESS)
@@ -47,6 +50,8 @@ public class PdfMessageConsumer {
 				channel.basicAck(deliveryTag, false);
 				return;
 			}
+
+			pdfProcessorService.processPdf(event);
 
 			logger.info("Processing successful for CorrelationID: {}", correlationId);
 
