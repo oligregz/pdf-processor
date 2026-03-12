@@ -16,9 +16,11 @@ public class PdfProcessorService {
 
 	private static final Logger logger = LoggerFactory.getLogger(PdfProcessorService.class);
 	private final StorageService storageService;
+	private final DatabaseService databaseService;
 
-	public PdfProcessorService(StorageService storageService) {
+	public PdfProcessorService(StorageService storageService, DatabaseService databaseService) {
 		this.storageService = storageService;
+		this.databaseService = databaseService;
 	}
 
 	public void processPdf(PdfUploadedEvent event) throws Exception {
@@ -26,6 +28,7 @@ public class PdfProcessorService {
 		String correlationId = event.correlationId();
 
 		logger.info("Starting processing for CorrelationID: {}", correlationId);
+		databaseService.startProcessing(correlationId);
 
 		byte[] pdfBytes = storageService.downloadFile(pdfKey);
 
@@ -35,6 +38,7 @@ public class PdfProcessorService {
 
 		storageService.uploadTextFile(txtKey, extractedText);
 
+		databaseService.finishProcessing(correlationId);
 		logger.info("Text extraction completed and saved in: {}", txtKey);
 
 	}
