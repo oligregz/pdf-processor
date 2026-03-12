@@ -15,7 +15,8 @@ import org.springframework.stereotype.Component;
 
 import com.portfolio.pdfworker.dto.PdfUploadedEvent;
 import com.portfolio.pdfworker.messaging.RabbitMQConstants;
-import com.portfolio.pdfworker.service.PdfProcessorService; // <-- Importação do Serviço
+import com.portfolio.pdfworker.service.DatabaseService;
+import com.portfolio.pdfworker.service.PdfProcessorService;
 import com.rabbitmq.client.Channel;
 
 @Component
@@ -25,11 +26,16 @@ public class PdfMessageConsumer {
 	private static final int MAX_RETRIES = 3;
 
 	private final RabbitTemplate rabbitTemplate;
-	private final PdfProcessorService pdfProcessorService; // <-- Dependência adicionada
+	private final PdfProcessorService pdfProcessorService;
+	private final DatabaseService databaseService;
 
-	public PdfMessageConsumer(RabbitTemplate rabbitTemplate, PdfProcessorService pdfProcessorService) {
+	public PdfMessageConsumer(
+			RabbitTemplate rabbitTemplate,
+			PdfProcessorService pdfProcessorService,
+			DatabaseService databaseService) {
 		this.rabbitTemplate = rabbitTemplate;
 		this.pdfProcessorService = pdfProcessorService;
+		this.databaseService = databaseService;
 	}
 
 	@RabbitListener(queues = RabbitMQConstants.Queues.PROCESS)
@@ -73,9 +79,15 @@ public class PdfMessageConsumer {
 	}
 
 	private void routeToDeadLetterQueue(Message message, PdfUploadedEvent event) {
+		String correlationId = event.correlationId();
+		String exceptionMessage = "Max retries exceeded for message.";
+		String stackTrace = "Message rejected after multiple reprocessing attempts (Wait Queue -> Main Queue).";
+
 		rabbitTemplate.send(
 				RabbitMQConstants.Exchange.PDF,
 				RabbitMQConstants.Routing.DLQ,
 				message);
+
+		databaseService.failProcessing(correlationId, exceptionMessage, stackTrace);
 	}
 }
