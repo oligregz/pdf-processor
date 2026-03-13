@@ -10,12 +10,13 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Configuration;
 
 @Configuration
 public class S3Config {
 
-	@Value("${cloudflare.r2.account-id}")
-	private String accountId;
+	@Value("${cloudflare.r2.bucket-url}")
+	private String endpointUrl;
 
 	@Value("${cloudflare.r2.access-key}")
 	private String accessKey;
@@ -25,13 +26,15 @@ public class S3Config {
 
 	@Bean
 	public S3Client s3Client() {
-		String endpointUrl = String.format("https://%s.r2.cloudflarestorage.com", accountId);
 
 		return S3Client.builder()
 				.endpointOverride(URI.create(endpointUrl))
 				.credentialsProvider(StaticCredentialsProvider.create(
 						AwsBasicCredentials.create(accessKey, secretKey)))
-				.region(Region.of("auto"))
+				.region(Region.US_EAST_1)
+				.serviceConfiguration(S3Configuration.builder()
+						.pathStyleAccessEnabled(true)
+						.build())
 				.build();
 	}
 }
