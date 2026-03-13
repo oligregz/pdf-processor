@@ -10,6 +10,8 @@ public record PdfUploadedEvent(
 	public record Payload(
 			String correlationId,
 			String userId,
+			String email,
+			String originalFileName,
 			String storagePath) {
 	}
 }
