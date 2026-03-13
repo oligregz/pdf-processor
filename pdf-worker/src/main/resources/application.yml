@@ -30,6 +30,19 @@ spring:
         acknowledge-mode: manual
         default-requeue-rejected: false
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_USER}
+    password: ${GMAIL_APP_PASS}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
 cloudflare:
   r2:
     account-id: ${CLOUDFLARE_ACCOUNT_ID:seu_account_id_aqui}
