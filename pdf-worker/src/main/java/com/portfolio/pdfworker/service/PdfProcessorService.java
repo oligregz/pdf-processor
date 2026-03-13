@@ -24,8 +24,8 @@ public class PdfProcessorService {
 	}
 
 	public void processPdf(PdfUploadedEvent event) throws Exception {
-		String pdfKey = event.storagePath();
-		String correlationId = event.correlationId();
+		String pdfKey = event.data().storagePath();
+		String correlationId = event.data().correlationId();
 
 		logger.info("Starting processing for CorrelationID: {}", correlationId);
 		databaseService.startProcessing(correlationId);

@@ -44,7 +44,7 @@ public class PdfMessageConsumer {
 			Channel channel,
 			@Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) throws IOException {
 
-		String correlationId = event.correlationId();
+		String correlationId = event.data().correlationId();
 		logger.info("Received message for CorrelationID: {}", correlationId);
 
 		try {
@@ -79,7 +79,7 @@ public class PdfMessageConsumer {
 	}
 
 	private void routeToDeadLetterQueue(Message message, PdfUploadedEvent event) {
-		String correlationId = event.correlationId();
+		String correlationId = event.data().correlationId();
 		String exceptionMessage = "Max retries exceeded for message.";
 		String stackTrace = "Message rejected after multiple reprocessing attempts (Wait Queue -> Main Queue).";
 
