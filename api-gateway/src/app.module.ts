@@ -11,7 +11,7 @@ import { validate } from './config/env.validation';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: '../.env',
       validate,
       expandVariables: true,
     }),
@@ -20,7 +20,7 @@ import { validate } from './config/env.validation';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        url: configService.get<string>('POSTGRES_URL'),
+        url: configService.get<string>('NEST_POSTGRES_URL'),
         autoLoadEntities: true,
         synchronize: false,
       }),
@@ -39,4 +39,4 @@ import { validate } from './config/env.validation';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

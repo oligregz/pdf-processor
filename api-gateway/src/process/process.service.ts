@@ -26,7 +26,7 @@ export class ProcessService {
     private readonly queueService: QueueService,
   ) { }
 
-  async processPdfUpload(userId: string, file: Express.Multer.File) {
+  async processPdfUpload(userId: string, email: string, file: Express.Multer.File) {
     await this.validateRateLimit(userId);
     const correlationId = this.generateCorrelationId();
 
@@ -49,6 +49,8 @@ export class ProcessService {
     this.queueService.publishPdfUploadedEvent({
       correlationId,
       userId,
+      email,
+      originalFileName: file.originalname,
       storagePath,
     });
 
