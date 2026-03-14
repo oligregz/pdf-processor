@@ -15,8 +15,8 @@ export class ProcessController {
     @UploadedFile(PdfValidationPipe) file: Express.Multer.File,
     @Req() req: any,
   ) {
-    const userId = req.user.userId;
+    const { userId, email } = req.user;
 
-    return await this.processService.processPdfUpload(userId, file);
+    return await this.processService.processPdfUpload(userId, email, file);
   }
 }

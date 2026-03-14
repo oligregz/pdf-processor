@@ -17,7 +17,7 @@ export class AuthService {
     @InjectModel(RateLimit.name)
     private readonly rateLimitModel: Model<RateLimit>,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async login(email: string) {
     let user = await this.userRepository.findOne({ where: { email } });
@@ -29,8 +29,15 @@ export class AuthService {
       user = await this.userRepository.save(user);
     }
 
-    const payload = { sub: user.id };
+    // A MÁGICA ACONTECE AQUI: O payload agora carrega o email
+    const payload = {
+      sub: user.id,
+      userId: user.id,
+      email: user.email
+    };
+
     const accessToken = this.jwtService.sign(payload);
+
     const expireAt = new Date();
     expireAt.setMinutes(expireAt.getMinutes() + 15);
 

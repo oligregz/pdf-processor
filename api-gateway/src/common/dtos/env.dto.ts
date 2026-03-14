@@ -35,9 +35,12 @@ export class EnvironmentVariables {
 
   @IsUrl({
     require_tld: false,
-  	protocols: ['postgres', 'postgresql'],
+    protocols: ['postgres', 'postgresql'],
   })
-  POSTGRES_URL: string;
+  NEST_POSTGRES_URL: string;
+
+  @IsString()
+  JDBC_POSTGRES_URL: string;
 
   @IsString()
   MONGO_HOST: string;
@@ -62,7 +65,7 @@ export class EnvironmentVariables {
 
   @IsUrl({
     require_tld: false,
-		protocols: ['mongodb', 'mongodb+srv'],
+    protocols: ['mongodb', 'mongodb+srv'],
   })
   MONGO_URL: string;
 
@@ -83,9 +86,15 @@ export class EnvironmentVariables {
 
   @IsUrl({
     require_tld: false,
-		protocols: ['amqp', 'amqps'],
+    protocols: ['amqp', 'amqps'],
   })
   RABBITMQ_URL: string;
+
+  @IsString()
+  GMAIL_USER: string;
+
+  @IsString()
+  GMAIL_APP_PASS: string;
 
   @IsString()
   JWT_SECRET: string;
@@ -96,4 +105,22 @@ export class EnvironmentVariables {
       'EXPIRATION_TIME_TO_LIVE must follow pattern like 15m, 10s, 2h, 7d',
   })
   EXPIRATION_TIME_TO_LIVE: string;
+
+  @IsString()
+  CLOUDFLARE_ACCOUNT_ID: string;
+
+  @IsString()
+  CLOUDFLARE_R2_ACCESS_KEY: string;
+
+  @IsString()
+  CLOUDFLARE_R2_SECRET_KEY: string;
+
+  @IsString()
+  CLOUDFLARE_R2_BUCKET_NAME: string;
+
+  @IsUrl({
+    require_tld: false,
+    protocols: ['https'],
+  })
+  CLOUDFLARE_R2_BUCKET_URL: string;
 }

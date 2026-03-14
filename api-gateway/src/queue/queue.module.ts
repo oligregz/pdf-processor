@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { QueueService } from './queue.service';
+import { RabbitMQ } from './rabbitmq.constants';
 
 @Module({
   imports: [
@@ -14,9 +15,10 @@ import { QueueService } from './queue.service';
           transport: Transport.RMQ,
           options: {
             urls: [configService.getOrThrow<string>('RABBITMQ_URL')],
-            queue: 'pdf.process.queue',
+            queue: RabbitMQ.Queues.PROCESS,
             queueOptions: {
               durable: true,
+              arguments: RabbitMQ.QueueArguments.PROCESS_DLQ,
             },
           },
         }),
@@ -26,4 +28,4 @@ import { QueueService } from './queue.service';
   providers: [QueueService],
   exports: [QueueService],
 })
-export class QueueModule {}
+export class QueueModule { }
