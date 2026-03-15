@@ -1,8 +1,6 @@
 services:
   api-gateway:
-    build: 
-      context: ../api-gateway
-      dockerfile: Dockerfile
+    image: ygregz/api-gateway:latest
     container_name: api-gateway
     restart: unless-stopped
     ports:
@@ -25,9 +23,7 @@ services:
       - rabbitmq
 
   pdf-worker:
-    build: 
-      context: ../pdf-worker
-      dockerfile: Dockerfile
+    image: SEU_USUARIO_DOCKERHUB/pdf-worker:latest
     container_name: pdf-worker
     restart: unless-stopped
     env_file:
