@@ -22,7 +22,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - postgres_dev_data:/var/lib/postgresql/data
-      - ../init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   mongodb:
     image: mongo:6-jammy
@@ -34,7 +34,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
     volumes:
       - mongodb_dev_data:/data/db
-      - ../init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
 
 volumes:
   postgres_dev_data:
