@@ -1,11 +1,11 @@
-import { 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  Column, 
-  CreateDateColumn, 
-  UpdateDateColumn, 
-  ManyToOne, 
-  JoinColumn 
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn
 } from 'typeorm';
 
 import { User } from '../../auth/entities/user.entity';
@@ -75,6 +75,9 @@ export class ProcessHistory {
     nullable: true,
   })
   fileDeletionTime: Date;
+
+  @Column({ name: 'error_log', type: 'text', nullable: true })
+  errorLog: string;
 
   @CreateDateColumn({
     name: 'created_at',
