@@ -1,42 +1,44 @@
-version: '3.8'
-
 services:
   api-gateway:
-    build: ./api-gateway
+    build: 
+      context: ../api-gateway
+      dockerfile: Dockerfile
     container_name: api-gateway
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "3000:3000"
+    env_file:
+      - ../.env
     environment:
       - NODE_ENV=production
-      - POSTGRES_URL=postgres://user:pass@postgres:5432/queue_db
-      - MONGO_URL=mongodb://user:pass@mongodb:27017/logs_db
-      - RABBITMQ_URL=amqp://user:pass@rabbitmq:5672
-      - CLOUDFLARE_R2_ACCESS_KEY=${R2_ACCESS_KEY}
-      - CLOUDFLARE_R2_SECRET_KEY=${R2_SECRET_KEY}
+      - POSTGRES_HOST=postgres
+      - MONGO_HOST=mongodb
+      - RABBITMQ_HOST=rabbitmq
+      - NEST_POSTGRES_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
+      - MONGO_URL=mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongodb:${MONGO_PORT}/${MONGO_DB}?authSource=${MONGO_AUTH_SOURCE}
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:${RABBITMQ_PORT}
     networks:
-      - public_net
-      - internal_backend_net
+      - pdf_network
     depends_on:
       - postgres
       - mongodb
       - rabbitmq
 
   pdf-worker:
-    build: ./pdf-worker
+    build: 
+      context: ../pdf-worker
+      dockerfile: Dockerfile
     container_name: pdf-worker
     restart: unless-stopped
+    env_file:
+      - ../.env
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - POSTGRES_URL=jdbc:postgresql://postgres:5432/queue_db
-      - MONGO_URL=mongodb://user:pass@mongodb:27017/logs_db
+      - POSTGRES_HOST=postgres
+      - MONGO_HOST=mongodb
       - RABBITMQ_HOST=rabbitmq
-      - CLOUDFLARE_R2_ACCESS_KEY=${R2_ACCESS_KEY}
-      - CLOUDFLARE_R2_SECRET_KEY=${R2_SECRET_KEY}
-      - SMTP_USER=${GMAIL_USER}
-      - SMTP_PASS=${GMAIL_APP_PASS}
     networks:
-      - internal_backend_net
+      - pdf_network
     depends_on:
       - postgres
       - mongodb
@@ -47,10 +49,10 @@ services:
     container_name: rabbitmq
     restart: unless-stopped
     environment:
-      - RABBITMQ_DEFAULT_USER=user
-      - RABBITMQ_DEFAULT_PASS=pass
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
     networks:
-      - internal_backend_net
+      - pdf_network
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
@@ -58,35 +60,34 @@ services:
     image: postgres:15-alpine
     container_name: postgres
     restart: unless-stopped
+    ports:
+      - "5432:5432"
     environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=pass
-      - POSTGRES_DB=queue_db
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     networks:
-      - internal_backend_net
+      - pdf_network
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ../init.sql:/docker-entrypoint-initdb.d/init.sql
 
   mongodb:
     image: mongo:6-jammy
     container_name: mongodb
     restart: unless-stopped
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=user
-      - MONGO_INITDB_ROOT_PASSWORD=pass
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
     networks:
-      - internal_backend_net
+      - pdf_network
     volumes:
       - mongodb_data:/data/db
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+      - ../init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
 
 networks:
-  public_net:
+  pdf_network:
     driver: bridge
-  internal_backend_net:
-    driver: bridge
-    internal: true
 
 volumes:
   postgres_data:
