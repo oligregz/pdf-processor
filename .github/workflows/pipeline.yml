@@ -101,5 +101,5 @@ jobs:
           script: |
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
             cd ~/pdf-processor/infra
-            docker compose pull
-            docker compose up -d
+            docker compose --env-file ../.env pull
+            docker compose --env-file ../.env up -d
