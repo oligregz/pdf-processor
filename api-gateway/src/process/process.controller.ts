@@ -18,6 +18,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { FileUploadDto } from 'src/common/dtos/file-upload.dto';
+import type { IAuthenticatedRequest } from 'src/common/interafces/process.interface';
 
 @ApiTags('Processamento de PDF')
 @ApiBearerAuth()
@@ -36,7 +37,7 @@ export class ProcessController {
   })
   async uploadPdf(
     @UploadedFile(PdfValidationPipe) file: Express.Multer.File,
-    @Req() req: any,
+    @Req() req: IAuthenticatedRequest,
   ) {
     const { userId, email } = req.user;
     return await this.processService.processPdfUpload(userId, email, file);
