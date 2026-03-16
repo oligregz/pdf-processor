@@ -17,7 +17,7 @@ export class AuthService {
     @InjectModel(RateLimit.name)
     private readonly rateLimitModel: Model<RateLimit>,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async login(email: string) {
     let user = await this.userRepository.findOne({ where: { email } });
@@ -33,7 +33,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       userId: user.id,
-      email: user.email
+      email: user.email,
     };
 
     const accessToken = this.jwtService.sign(payload);

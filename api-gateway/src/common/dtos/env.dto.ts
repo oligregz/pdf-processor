@@ -1,11 +1,4 @@
-import {
-  IsNumber,
-  IsString,
-  IsUrl,
-  Matches,
-  Min,
-  Max,
-} from 'class-validator';
+import { IsNumber, IsString, IsUrl, Matches, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class EnvironmentVariables {

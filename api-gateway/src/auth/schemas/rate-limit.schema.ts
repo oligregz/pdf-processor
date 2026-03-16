@@ -4,7 +4,6 @@ import { RateLimitActionEnum } from 'src/common/enums/rate-limit-action.enum';
 
 @Schema({ collection: 'rate_limits' })
 export class RateLimit extends Document {
-
   @Prop({ required: true, index: true })
   userId: string;
 
