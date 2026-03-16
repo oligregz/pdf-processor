@@ -5,7 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  JoinColumn
+  JoinColumn,
 } from 'typeorm';
 
 import { User } from '../../auth/entities/user.entity';
@@ -13,7 +13,6 @@ import { ProcessStatusEnum } from 'src/common/enums/process-status.enum';
 
 @Entity('process_history')
 export class ProcessHistory {
-
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

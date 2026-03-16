@@ -1,4 +1,8 @@
-import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
@@ -9,15 +13,23 @@ export class StorageService {
   private readonly bucketName: string;
 
   constructor(private readonly configService: ConfigService) {
-    const accountId = this.configService.getOrThrow<string>('CLOUDFLARE_ACCOUNT_ID');
-    this.bucketName = this.configService.getOrThrow<string>('CLOUDFLARE_R2_BUCKET_NAME');
+    const accountId = this.configService.getOrThrow<string>(
+      'CLOUDFLARE_ACCOUNT_ID',
+    );
+    this.bucketName = this.configService.getOrThrow<string>(
+      'CLOUDFLARE_R2_BUCKET_NAME',
+    );
 
     this.s3Client = new S3Client({
       region: 'auto',
       endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
       credentials: {
-        accessKeyId: this.configService.getOrThrow<string>('CLOUDFLARE_R2_ACCESS_KEY'),
-        secretAccessKey: this.configService.getOrThrow<string>('CLOUDFLARE_R2_SECRET_KEY'),
+        accessKeyId: this.configService.getOrThrow<string>(
+          'CLOUDFLARE_R2_ACCESS_KEY',
+        ),
+        secretAccessKey: this.configService.getOrThrow<string>(
+          'CLOUDFLARE_R2_SECRET_KEY',
+        ),
       },
     });
   }
@@ -36,9 +48,19 @@ export class StorageService {
       await this.s3Client.send(command);
       this.logger.log(`File [${objectKey}] successfully uploaded to R2.`);
       return objectKey;
-    } catch (error) {
-      this.logger.error(`Failed to upload file to R2: ${error.message}`, error.stack);
-      throw new InternalServerErrorException('Error uploading file to storage provider.');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(
+          `Failed to upload file to R2: ${error.message}`,
+          error.stack,
+        );
+      } else {
+        this.logger.error('Failed to upload file to R2: Unknown error', error);
+      }
+
+      throw new InternalServerErrorException(
+        'Error uploading file to storage provider.',
+      );
     }
   }
 }

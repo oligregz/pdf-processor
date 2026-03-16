@@ -1,6 +1,7 @@
 services:
   api-gateway:
-    build: 
+    image: ygregz/api-gateway:latest
+    build:
       context: ../api-gateway
       dockerfile: Dockerfile
     container_name: api-gateway
@@ -25,7 +26,8 @@ services:
       - rabbitmq
 
   pdf-worker:
-    build: 
+    image: ygregz/pdf-worker:latest
+    build:
       context: ../pdf-worker
       dockerfile: Dockerfile
     container_name: pdf-worker

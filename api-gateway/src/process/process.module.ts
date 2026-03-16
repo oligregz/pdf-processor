@@ -13,7 +13,9 @@ import { QueueModule } from 'src/queue/queue.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([ProcessHistory, QueueState]),
-    MongooseModule.forFeature([{ name: ErrorLog.name, schema: ErrorLogSchema }]),
+    MongooseModule.forFeature([
+      { name: ErrorLog.name, schema: ErrorLogSchema },
+    ]),
     AuthModule,
     StorageModule,
     QueueModule,

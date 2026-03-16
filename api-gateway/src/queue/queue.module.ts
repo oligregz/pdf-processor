@@ -28,4 +28,4 @@ import { RabbitMQ } from './rabbitmq.constants';
   providers: [QueueService],
   exports: [QueueService],
 })
-export class QueueModule { }
+export class QueueModule {}

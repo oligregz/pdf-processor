@@ -1,0 +1,105 @@
+name: ci/cd-pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: API Gateway validation (Install, Lint, Test, Build)
+        working-directory: ./api-gateway
+        run: |
+          npm ci
+          npm run lint
+          npm run test --if-present
+          npm run build
+
+      # - name: Interface validation(Install, Lint, Test, Build)
+      #   working-directory: ./interface
+      #   run: |
+      #     npm ci
+      #     npm run lint
+      #     npm run test --if-present
+      #     npm run build
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: PDF Worker validation (Test and Build)
+        working-directory: ./pdf-worker
+        run: |
+          mvn test
+          mvn clean package -DskipTests
+
+  delivery:
+    needs: integration
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Docker Hub Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker Build & Push - API Gateway
+        uses: docker/build-push-action@v5
+        with:
+          context: ./api-gateway
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest
+
+      - name: Docker Build & Push - PDF Worker
+        uses: docker/build-push-action@v5
+        with:
+          context: ./pdf-worker
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/pdf-worker:latest
+
+      # - name: Docker Build & Push - Interface
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: ./interface
+      #     push: true
+      #     tags: ${{ secrets.DOCKER_USERNAME }}/interface:latest
+
+  deploy:
+    needs: delivery
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Perform deployment via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: DOCKER_USERNAME,DOCKER_PASSWORD
+          script: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            cd ~/pdf-processor/infra
+            docker compose pull
+            docker compose up -d
