@@ -7,10 +7,7 @@ export class RateLimit extends Document {
   @Prop({ required: true, index: true })
   userId: string;
 
-  @Prop({
-    required: true,
-    enum: Object.values(RateLimitActionEnum),
-  })
+  @Prop({ type: String, enum: RateLimitActionEnum, required: true })
   action: RateLimitActionEnum;
 
   @Prop({

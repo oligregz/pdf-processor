@@ -29,7 +29,6 @@ export class AuthService {
       user = await this.userRepository.save(user);
     }
 
-    // A MÁGICA ACONTECE AQUI: O payload agora carrega o email
     const payload = {
       sub: user.id,
       userId: user.id,
