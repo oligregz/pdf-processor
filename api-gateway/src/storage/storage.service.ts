@@ -48,11 +48,16 @@ export class StorageService {
       await this.s3Client.send(command);
       this.logger.log(`File [${objectKey}] successfully uploaded to R2.`);
       return objectKey;
-    } catch (error) {
-      this.logger.error(
-        `Failed to upload file to R2: ${error.message}`,
-        error.stack,
-      );
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(
+          `Failed to upload file to R2: ${error.message}`,
+          error.stack,
+        );
+      } else {
+        this.logger.error('Failed to upload file to R2: Unknown error', error);
+      }
+
       throw new InternalServerErrorException(
         'Error uploading file to storage provider.',
       );
