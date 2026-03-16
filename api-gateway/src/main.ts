@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { Logger } from '@nestjs/common'; // <-- 1. Importar o Logger nativo
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -32,4 +32,8 @@ async function bootstrap() {
   logger.log(`🚀 Application running successfully on: ${appUrl}`);
   logger.log(`📚 Swagger documentation is available at: ${appUrl}/api/docs`);
 }
-bootstrap();
+bootstrap().catch((error) => {
+  const logger = new Logger('Bootstrap');
+  logger.error('Application failed to start', error);
+  process.exit(1);
+});
