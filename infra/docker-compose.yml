@@ -27,6 +27,9 @@ services:
 
   pdf-worker:
     image: ygregz/pdf-worker:latest
+    build:
+      context: ../pdf-worker
+      dockerfile: Dockerfile
     container_name: pdf-worker
     restart: unless-stopped
     env_file:
