@@ -91,7 +91,7 @@ export class ProcessService {
 
     try {
       return await this.storageService.uploadPdf(file.buffer, uniqueFileName);
-    } catch (error) {
+    } catch {
       throw new HttpException(
         'Storage service is currently unavailable. Please try again later.',
         HttpStatus.INTERNAL_SERVER_ERROR,
