@@ -26,10 +26,7 @@ export class EnvironmentVariables {
   @IsString()
   POSTGRES_DB: string;
 
-  @IsUrl({
-    require_tld: false,
-    protocols: ['postgres', 'postgresql'],
-  })
+  @IsString()
   NEST_POSTGRES_URL: string;
 
   @IsString()
@@ -56,10 +53,7 @@ export class EnvironmentVariables {
   @IsString()
   MONGO_AUTH_SOURCE: string;
 
-  @IsUrl({
-    require_tld: false,
-    protocols: ['mongodb', 'mongodb+srv'],
-  })
+  @IsString()
   MONGO_URL: string;
 
   @IsString()
@@ -77,10 +71,7 @@ export class EnvironmentVariables {
   @IsString()
   RABBITMQ_PASSWORD: string;
 
-  @IsUrl({
-    require_tld: false,
-    protocols: ['amqp', 'amqps'],
-  })
+  @IsString()
   RABBITMQ_URL: string;
 
   @IsString()
