@@ -24,25 +24,31 @@ export class ProcessService {
     private readonly rateLimitModel: Model<RateLimit>,
     private readonly storageService: StorageService,
     private readonly queueService: QueueService,
-  ) { }
+  ) {}
 
-  async processPdfUpload(userId: string, email: string, file: Express.Multer.File) {
+  async processPdfUpload(
+    userId: string,
+    email: string,
+    file: Express.Multer.File,
+  ) {
     await this.validateRateLimit(userId);
     const correlationId = this.generateCorrelationId();
 
     const storagePath = await this.uploadToCloud(file, correlationId);
 
-    const processHistory = await this.dataSource.transaction(async (manager: EntityManager) => {
-      const history = await this.createProcessHistory(
-        manager,
-        userId,
-        correlationId,
-        storagePath,
-      );
+    const processHistory = await this.dataSource.transaction(
+      async (manager: EntityManager) => {
+        const history = await this.createProcessHistory(
+          manager,
+          userId,
+          correlationId,
+          storagePath,
+        );
 
-      await this.createRateLimitRecord(userId);
-      return history;
-    });
+        await this.createRateLimitRecord(userId);
+        return history;
+      },
+    );
 
     this.logAcceptedUpload(userId, storagePath, correlationId);
 
@@ -76,13 +82,16 @@ export class ProcessService {
     return uuidv4();
   }
 
-  private async uploadToCloud(file: Express.Multer.File, correlationId: string): Promise<string> {
+  private async uploadToCloud(
+    file: Express.Multer.File,
+    correlationId: string,
+  ): Promise<string> {
     const fileExtension = file.originalname.split('.').pop();
     const uniqueFileName = `${correlationId}.${fileExtension}`;
 
     try {
       return await this.storageService.uploadPdf(file.buffer, uniqueFileName);
-    } catch (error) {
+    } catch {
       throw new HttpException(
         'Storage service is currently unavailable. Please try again later.',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -124,8 +133,14 @@ export class ProcessService {
     return expireAt;
   }
 
-  private logAcceptedUpload(userId: string, fileName: string, correlationId: string) {
-    this.logger.log(`File [${fileName}] accepted for user ${userId}. CorrelationID: ${correlationId}`);
+  private logAcceptedUpload(
+    userId: string,
+    fileName: string,
+    correlationId: string,
+  ) {
+    this.logger.log(
+      `File [${fileName}] accepted for user ${userId}. CorrelationID: ${correlationId}`,
+    );
   }
 
   private buildResponse(processHistory: ProcessHistory, correlationId: string) {

@@ -9,7 +9,9 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('PDF Processor API')
-    .setDescription('API Gateway para envio e processamento assíncrono de PDFs com RabbitMQ e Spring Boot.')
+    .setDescription(
+      'API Gateway para envio e processamento assíncrono de PDFs com RabbitMQ e Spring Boot.',
+    )
     .setVersion('1.0')
     .addBearerAuth()
     .build();

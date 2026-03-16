@@ -14,13 +14,20 @@ import { JwtStrategy } from './jwt.strategy';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
-    MongooseModule.forFeature([{ name: RateLimit.name, schema: RateLimitSchema }]),
+    MongooseModule.forFeature([
+      { name: RateLimit.name, schema: RateLimitSchema },
+    ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: configService.get<number | StringValue>('EXPIRATION_TIME_TO_LIVE') ?? '15m' },
+        signOptions: {
+          expiresIn:
+            configService.get<number | StringValue>(
+              'EXPIRATION_TIME_TO_LIVE',
+            ) ?? '15m',
+        },
       }),
     }),
   ],
