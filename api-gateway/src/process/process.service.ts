@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, EntityManager } from 'typeorm';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 import { ProcessHistory } from './entities/process-history.entity';
 import { RateLimit } from '../auth/schemas/rate-limit.schema';
@@ -79,7 +79,7 @@ export class ProcessService {
   }
 
   private generateCorrelationId(): string {
-    return uuidv4();
+    return randomUUID();
   }
 
   private async uploadToCloud(
