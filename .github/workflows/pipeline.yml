@@ -28,13 +28,13 @@ jobs:
           npm run test --if-present
           npm run build
 
-      # - name: Interface validation(Install, Lint, Test, Build)
-      #   working-directory: ./interface
-      #   run: |
-      #     npm ci
-      #     npm run lint
-      #     npm run test --if-present
-      #     npm run build
+      - name: Interface validation (Install, Lint, Test, Build)
+        working-directory: ./interface
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run test -- --watch=false
+          npm run build
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
