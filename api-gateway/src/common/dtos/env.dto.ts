@@ -19,7 +19,7 @@ export class EnvironmentVariables {
 
   @Transform(({ value }): string[] => parseCorsOrigins(value))
   @IsArray()
-  @IsUrl({}, { each: true })
+  @IsUrl({ require_tld: false }, { each: true })
   CORS_ORIGINS: string[];
 
   @IsString()
