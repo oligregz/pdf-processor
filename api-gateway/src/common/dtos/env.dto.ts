@@ -1,5 +1,14 @@
-import { IsNumber, IsString, IsUrl, Matches, Min, Max } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsNumber,
+  IsString,
+  IsUrl,
+  Matches,
+  Min,
+  Max,
+  IsArray,
+} from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { parseCorsOrigins } from '../utils/parse-cors-origins.util';
 
 export class EnvironmentVariables {
   @IsNumber()
@@ -7,6 +16,11 @@ export class EnvironmentVariables {
   @Min(1)
   @Max(65535)
   PORT: number;
+
+  @Transform(({ value }): string[] => parseCorsOrigins(value))
+  @IsArray()
+  @IsUrl({}, { each: true })
+  CORS_ORIGINS: string[];
 
   @IsString()
   POSTGRES_HOST: string;
