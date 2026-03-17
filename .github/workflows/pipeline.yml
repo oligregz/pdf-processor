@@ -76,12 +76,12 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/pdf-worker:latest
 
-      # - name: Docker Build & Push - Interface
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: ./interface
-      #     push: true
-      #     tags: ${{ secrets.DOCKER_USERNAME }}/interface:latest
+      - name: Docker Build & Push - Interface
+        uses: docker/build-push-action@v5
+        with:
+          context: ./interface
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/interface:latest
 
   deploy:
     needs: delivery
