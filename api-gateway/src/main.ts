@@ -6,6 +6,15 @@ import { Logger } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('API Gateway');
+  const corsOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',')
+    : [];
+
+  app.enableCors({
+    origin: corsOrigins,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('PDF Processor API')
@@ -31,6 +40,7 @@ async function bootstrap() {
 
   logger.log(`🚀 Application running successfully on: ${appUrl}`);
   logger.log(`📚 Swagger documentation is available at: ${appUrl}/api/docs`);
+  logger.log(`🛡️ CORS enabled for origins: ${corsOrigins.join(' | ')}`);
 }
 bootstrap().catch((error) => {
   const logger = new Logger('Bootstrap');
