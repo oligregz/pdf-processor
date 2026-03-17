@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../auth/auth'; 
 
 @Component({
   selector: 'app-login',
@@ -14,7 +16,11 @@ export class LoginComponent {
   isLoading = false;
   errorMessage = '';
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
@@ -29,13 +35,16 @@ export class LoginComponent {
     this.isLoading = true;
     this.errorMessage = '';
     
-    const { email, password } = this.loginForm.value;
-    
-    console.log('Trying to log in with:', email, password);
-    
-    setTimeout(() => {
-      this.isLoading = false;
-      console.log('Simulated login successful!');
-    }, 1500);
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Login error:', err);
+        this.errorMessage = 'Simulated login successful!';
+      }
+    });
   }
 }
