@@ -28,13 +28,13 @@ jobs:
           npm run test --if-present
           npm run build
 
-      # - name: Interface validation(Install, Lint, Test, Build)
-      #   working-directory: ./interface
-      #   run: |
-      #     npm ci
-      #     npm run lint
-      #     npm run test --if-present
-      #     npm run build
+      - name: Interface validation (Install, Lint, Test, Build)
+        working-directory: ./interface
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run test -- --watch=false
+          npm run build
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -76,12 +76,12 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/pdf-worker:latest
 
-      # - name: Docker Build & Push - Interface
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: ./interface
-      #     push: true
-      #     tags: ${{ secrets.DOCKER_USERNAME }}/interface:latest
+      - name: Docker Build & Push - Interface
+        uses: docker/build-push-action@v5
+        with:
+          context: ./interface
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/interface:latest
 
   deploy:
     needs: delivery
