@@ -2,17 +2,27 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('API Gateway');
+  const configService = app.get(ConfigService);
+
+  const corsOrigins = configService.get<string[]>('CORS_ORIGINS') ?? [];
+
+  app.enableCors({
+    origin: corsOrigins,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('PDF Processor API')
     .setDescription(
-      'API Gateway para envio e processamento assíncrono de PDFs com RabbitMQ e Spring Boot.',
+      'API Gateway for asynchronous sending and processing of PDFs using RabbitMQ and Spring Boot.',
     )
-    .setVersion('1.0')
+    .setVersion('1.1')
     .addBearerAuth()
     .build();
 
@@ -31,6 +41,7 @@ async function bootstrap() {
 
   logger.log(`🚀 Application running successfully on: ${appUrl}`);
   logger.log(`📚 Swagger documentation is available at: ${appUrl}/api/docs`);
+  logger.log(`🛡️ CORS enabled for origins: ${corsOrigins.join(' | ')}`);
 }
 bootstrap().catch((error) => {
   const logger = new Logger('Bootstrap');
