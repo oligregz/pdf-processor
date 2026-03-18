@@ -1,0 +1,51 @@
+.upload-container {
+  max-width: 600px;
+  margin: 50px auto;
+  text-align: center;
+  font-family: sans-serif;
+}
+
+.dropzone {
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  padding: 50px 20px;
+  margin: 20px 0;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+
+  &.active {
+    border-color: #4CAF50;
+    background-color: #e8f5e9;
+  }
+
+  &:hover {
+    border-color: #2196F3;
+    background-color: #e3f2fd;
+  }
+
+  .file-name {
+    color: #2e7d32;
+  }
+}
+
+.status-message {
+  margin-bottom: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.btn-upload {
+  padding: 10px 25px;
+  font-size: 16px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+}

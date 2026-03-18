@@ -12,10 +12,10 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(credentials: any): Observable<any> {
-    return this.http.post<{ access_token: string }>(this.API_URL, credentials)
+    return this.http.post<{ accessToken: string }>(this.API_URL, credentials)
       .pipe(
         tap(response => {
-          localStorage.setItem('pdf_token', response.access_token);
+          localStorage.setItem('pdf_token', response.accessToken);
         })
       );
   }
