@@ -38,8 +38,7 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value).subscribe({
       next: (res) => {
         this.isLoading = false;
-        console.log('Login successfuly!', res);
-
+        this.router.navigate(['/upload']);
       },
       error: (err) => {
         this.isLoading = false;
