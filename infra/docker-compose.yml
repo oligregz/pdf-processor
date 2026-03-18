@@ -1,4 +1,16 @@
 services:
+  interface:
+    image: ygregz/interface:latest
+    build:
+      context: ../interface
+      dockerfile: Dockerfile
+    container_name: interface
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    networks:
+      - pdf_network
+
   api-gateway:
     image: ygregz/api-gateway:latest
     build:
