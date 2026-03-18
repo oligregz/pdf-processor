@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class UploadService {
-  private readonly API_URL = `${environment.apiUrl}/upload`;
+  private readonly API_URL = `${environment.apiUrl}/process/upload`;
 
   constructor(private http: HttpClient) {}
 
