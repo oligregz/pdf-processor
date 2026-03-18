@@ -1,1 +1,35 @@
-<p>upload works!</p>
+<div class="upload-container">
+  <h2>Send PDF for Processing</h2>
+  
+  <div 
+    class="dropzone" 
+    [class.active]="isDragging"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    (click)="fileInput.click()"
+  >
+    <p *ngIf="!selectedFile">Drag and drop your PDF here or click to select.</p>
+    <p *ngIf="selectedFile" class="file-name">File ready: <strong>{{ selectedFile.name }}</strong></p>
+    
+    <input 
+      type="file" 
+      #fileInput 
+      accept="application/pdf" 
+      (change)="onFileSelected($event)" 
+      style="display: none;"
+    >
+  </div>
+
+  <div class="status-message" *ngIf="message">
+    {{ message }}
+  </div>
+
+  <button 
+    (click)="upload()" 
+    [disabled]="!selectedFile || isUploading"
+    class="btn-upload"
+  >
+    {{ isUploading ? 'Sending...' : 'Process file' }}
+  </button>
+</div>
