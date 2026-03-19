@@ -2,9 +2,15 @@ import {
   Injectable,
   Logger,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} from '@aws-sdk/client-s3';
+import { Readable } from 'stream';
 
 @Injectable()
 export class StorageService {
@@ -61,6 +67,35 @@ export class StorageService {
       throw new InternalServerErrorException(
         'Error uploading file to storage provider.',
       );
+    }
+  }
+
+  async getFileStream(fileKey: string): Promise<Readable> {
+    const command = new GetObjectCommand({
+      Bucket: this.bucketName,
+      Key: fileKey,
+    });
+
+    try {
+      const response = await this.s3Client.send(command);
+      this.logger.log(
+        `File stream [${fileKey}] successfully retrieved from R2.`,
+      );
+      return response.Body as Readable;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(
+          `Failed to retrieve file from R2: ${error.message}`,
+          error.stack,
+        );
+      } else {
+        this.logger.error(
+          'Failed to retrieve file from R2: Unknown error',
+          error,
+        );
+      }
+
+      throw new NotFoundException('File not found or processing incomplete.');
     }
   }
 }
