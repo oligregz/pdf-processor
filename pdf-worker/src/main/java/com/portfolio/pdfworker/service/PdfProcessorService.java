@@ -44,7 +44,7 @@ public class PdfProcessorService {
 		databaseService.finishProcessing(correlationId);
 		logger.info("Text extraction completed and saved in: {}", txtKey);
 
-		emailService.sendCompletionEmail(userEmail, originalFileName, txtKey);
+		emailService.sendCompletionEmail(userEmail, originalFileName, correlationId);
 	}
 
 	private String extractTextFromPdf(byte[] pdfBytes) throws IOException {
