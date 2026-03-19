@@ -31,7 +31,7 @@ export class DownloadComponent implements OnInit {
     this.isDownloading = true;
     this.errorMessage = '';
 
-    const downloadUrl = `${environment.apiUrl}/files/${this.correlationId}/download`;
+    const downloadUrl = `${environment.apiUrl}/process/${this.correlationId}/download`;
 
     this.http.get(downloadUrl, { responseType: 'blob' }).subscribe({
       next: (blob) => {

@@ -1,1 +1,18 @@
-<p>download works!</p>
+<div class="download-container">
+  <div class="download-card">
+    <h2>Your file is ready!</h2>
+    <p>Your PDF has been successfully processed into a text file.</p>
+    
+    <div class="error-banner" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <button 
+      class="btn-download" 
+      (click)="downloadFile()" 
+      [disabled]="!correlationId || isDownloading"
+    >
+      {{ isDownloading ? 'Downloading...' : 'Download file' }}
+    </button>
+  </div>
+</div>
