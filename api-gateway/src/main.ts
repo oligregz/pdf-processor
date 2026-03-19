@@ -22,7 +22,7 @@ async function bootstrap() {
     .setDescription(
       'API Gateway for asynchronous sending and processing of PDFs using RabbitMQ and Spring Boot.',
     )
-    .setVersion('1.1')
+    .setVersion('1.2')
     .addBearerAuth()
     .build();
 
