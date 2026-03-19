@@ -25,11 +25,15 @@ import {
 import { FileUploadDto } from 'src/common/dtos/file-upload.dto';
 import type { IAuthenticatedRequest } from 'src/common/interafces/process.interface';
 import { ApiDownloadDocs } from 'src/common/decorators/download-docs.decorator';
+import { StorageService } from 'src/storage/storage.service';
 
 @ApiTags('PDF Processing')
 @Controller('process')
 export class ProcessController {
-  constructor(private readonly processService: ProcessService) {}
+  constructor(
+    private readonly processService: ProcessService,
+    private readonly storageService: StorageService,
+  ) {}
 
   @Post('upload')
   @ApiBearerAuth()
@@ -54,18 +58,21 @@ export class ProcessController {
     summary: 'Download the processed TXT file via Correlation ID',
   })
   @ApiDownloadDocs()
-  downloadProcessedFile(
+  async downloadProcessedFile(
     @Param('correlationId') correlationId: string,
     @Res() res: Response,
   ) {
     try {
+      const fileKey = `pdfs/${correlationId}.txt`;
+
+      const fileStream = await this.storageService.getFileStream(fileKey);
+
       res.set({
         'Content-Type': 'text/plain',
         'Content-Disposition': `attachment; filename="processed_${correlationId}.txt"`,
       });
-      res.send(
-        `This is a mock text file for correlation ID: ${correlationId}.\nYour R2 integration will replace this.`,
-      );
+
+      fileStream.pipe(res);
     } catch {
       res.status(HttpStatus.NOT_FOUND).json({
         message: 'File not ready or does not exist.',
