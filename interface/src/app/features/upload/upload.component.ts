@@ -6,8 +6,8 @@ import { UploadService } from './upload.service';
   selector: 'app-upload',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './upload.html',
-  styleUrl: './upload.scss'
+  templateUrl: './upload.component.html',
+  styleUrl: './upload.component.scss'
 })
 export class UploadComponent {
   isDragging = false;
