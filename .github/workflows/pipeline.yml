@@ -100,6 +100,8 @@ jobs:
           envs: DOCKER_USERNAME,DOCKER_PASSWORD
           script: |
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            cd ~/pdf-processor/infra
+            cd ~/pdf-processor
+            git pull origin main         
+            cd infra
             docker compose --env-file ../.env pull
             docker compose --env-file ../.env up -d
