@@ -1,18 +1,45 @@
-<div class="download-container">
-  <div class="download-card">
-    <h2>Your file is ready!</h2>
-    <p>Your PDF has been successfully processed into a text file.</p>
-    
-    <div class="error-banner" *ngIf="errorMessage">
-      {{ errorMessage }}
+<div class="w-full max-w-md bg-dark-surface border border-gray-800 rounded-2xl shadow-2xl p-8 sm:p-10 animate-in fade-in zoom-in-95 duration-500">
+  
+  <div class="flex flex-col items-center mb-8 text-center">
+    <div class="w-16 h-16 bg-status-success/10 text-status-success rounded-2xl flex items-center justify-center mb-5 border border-status-success/20">
+      <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
     </div>
+    
+    <h2 class="text-2xl font-bold text-text-main tracking-wide">Your file is ready!</h2>
+    <p class="text-text-muted mt-2 text-sm leading-relaxed">
+      Your PDF has been successfully processed into a text file. Click the button below to save it to your device.
+    </p>
+  </div>
 
-    <button 
-      class="btn-download" 
-      (click)="downloadFile()" 
-      [disabled]="!correlationId || isDownloading"
+  <div class="mt-2">
+    <app-button
+      variant="primary"
+      [fullWidth]="true"
+      [isLoading]="isDownloading()"
+      [disabled]="!correlationId()"
+      (onClick)="downloadFile()"
     >
-      {{ isDownloading ? 'Downloading...' : 'Download file' }}
-    </button>
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+      </svg>
+      Download File
+    </app-button>
   </div>
 </div>
+
+<app-modal
+  [(isOpen)]="isModalOpen"
+  [type]="modalType()"
+  [title]="modalTitle()"
+  [preventCloseOnBackdrop]="false"
+>
+  {{ modalMessage() }}
+  
+  <div modal-footer>
+    <app-button variant="secondary" (onClick)="isModalOpen.set(false)">
+      Close
+    </app-button>
+  </div>
+</app-modal>
