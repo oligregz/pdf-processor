@@ -1,23 +1,22 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment'; 
+import { ILoginRequest, ILoginResponse } from '../../shared/common/types/auth.type';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private http = inject(HttpClient);
   private readonly API_URL = `${environment.apiUrl}/auth/login`;
 
-  constructor(private http: HttpClient) {}
-
-  login(credentials: any): Observable<any> {
-    return this.http.post<{ accessToken: string }>(this.API_URL, credentials)
-      .pipe(
-        tap(response => {
-          localStorage.setItem('pdf_token', response.accessToken);
-        })
-      );
+  login(credentials: ILoginRequest): Observable<ILoginResponse> {
+    return this.http.post<ILoginResponse>(this.API_URL, credentials).pipe(
+      tap(response => {
+        localStorage.setItem('pdf_token', response.accessToken);
+      })
+    );
   }
 
   logout(): void {
