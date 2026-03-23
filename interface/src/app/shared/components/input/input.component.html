@@ -1,0 +1,22 @@
+<div class="flex flex-col gap-1.5 w-full">
+  @if (label()) {
+    <label [for]="id()" class="text-sm font-medium text-text-main">
+      {{ label() }}
+    </label>
+  }
+
+  <input
+    [id]="id()"
+    [type]="type()"
+    [placeholder]="placeholder()"
+    [disabled]="disabled()"
+    [(ngModel)]="value"
+    [class]="inputClasses()"
+  />
+
+  @if (errorMessage()) {
+    <span class="text-sm font-medium text-status-error mt-1">
+      {{ errorMessage() }}
+    </span>
+  }
+</div>
