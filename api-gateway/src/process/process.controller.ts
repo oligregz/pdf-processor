@@ -9,9 +9,10 @@ import {
   UseInterceptors,
   UploadedFile,
   Req,
+  Logger,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import type { Response } from 'express'; // Correção 2: importação como 'type'
+import type { Response } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ProcessService } from './process.service';
 import { PdfValidationPipe } from './pipes/pdf-validation.pipe';
@@ -26,13 +27,17 @@ import { FileUploadDto } from 'src/common/dtos/file-upload.dto';
 import type { IAuthenticatedRequest } from 'src/common/interafces/process.interface';
 import { ApiDownloadDocs } from 'src/common/decorators/download-docs.decorator';
 import { StorageService } from 'src/storage/storage.service';
+import { EventsGateway } from '../events/events.gateway';
 
 @ApiTags('PDF Processing')
 @Controller('process')
 export class ProcessController {
+  private readonly logger = new Logger(ProcessController.name);
+
   constructor(
     private readonly processService: ProcessService,
     private readonly storageService: StorageService,
+    private readonly eventsGateway: EventsGateway,
   ) {}
 
   @Post('upload')
@@ -50,6 +55,16 @@ export class ProcessController {
     @Req() req: IAuthenticatedRequest,
   ) {
     const { userId, email } = req.user;
+
+    if (this.eventsGateway.canProcessImmediately()) {
+      this.eventsGateway.incrementProcessingCount();
+      this.eventsGateway.notifyJobProcessing(userId);
+    } else {
+      this.eventsGateway.incrementProcessingCount();
+      const position = this.eventsGateway.getCurrentQueueDepth();
+      this.eventsGateway.notifyJobQueued(userId, position);
+    }
+
     return await this.processService.processPdfUpload(userId, email, file);
   }
 
@@ -64,7 +79,6 @@ export class ProcessController {
   ) {
     try {
       const fileKey = `pdfs/${correlationId}.txt`;
-
       const fileStream = await this.storageService.getFileStream(fileKey);
 
       res.set({
@@ -73,7 +87,14 @@ export class ProcessController {
       });
 
       fileStream.pipe(res);
-    } catch {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Failed to download file: ${correlationId}`,
+        errorMessage,
+      );
+
       res.status(HttpStatus.NOT_FOUND).json({
         message: 'File not ready or does not exist.',
       });
