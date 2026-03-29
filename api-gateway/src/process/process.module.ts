@@ -9,6 +9,7 @@ import { ErrorLog, ErrorLogSchema } from './schemas/error-log.schema';
 import { StorageModule } from 'src/storage/storage.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { QueueModule } from 'src/queue/queue.module';
+import { EventsGateway } from 'src/events/events.gateway';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { QueueModule } from 'src/queue/queue.module';
     StorageModule,
     QueueModule,
   ],
-  providers: [ProcessService],
+  providers: [ProcessService, EventsGateway],
   controllers: [ProcessController],
 })
 export class ProcessModule {}
