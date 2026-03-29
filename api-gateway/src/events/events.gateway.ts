@@ -32,7 +32,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const token = client.handshake.auth['token'] as string | undefined;
 
       if (!token) {
-        throw new Error('Token não fornecido');
+        throw new Error('Token not provided');
       }
 
       const secret = this.configService.getOrThrow<string>('JWT_SECRET');
@@ -49,7 +49,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(`Client connected: ${client.id} (User: ${userId})`);
     } catch (error) {
       this.logger.error(
-        `Conexão recusada: ${client.id} - Motivo: ${(error as Error).message}`,
+        `Connection refused: ${client.id} - Reason: ${(error as Error).message}`,
       );
       client.disconnect(true);
     }
