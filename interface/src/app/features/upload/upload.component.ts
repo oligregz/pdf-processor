@@ -4,6 +4,7 @@ import { SocketService } from '../../core/services/socket.service';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { ModalType } from '../../shared/common/types/modal.type';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-upload',
@@ -17,7 +18,9 @@ export class UploadComponent implements OnInit, OnDestroy {
 
   public isDragging = signal<boolean>(false);
   public selectedFile = signal<File | null>(null);
-  
+
+  public isUploading = signal<boolean>(false);
+
   public isModalOpen = signal<boolean>(false);
   public modalType = signal<ModalType>('info');
   public modalTitle = signal<string>('');
@@ -27,17 +30,6 @@ export class UploadComponent implements OnInit, OnDestroy {
     const file = this.selectedFile();
     if (!file) return '';
     return (file.size / (1024 * 1024)).toFixed(2) + ' MB';
-  });
-
-  private statusEffect = computed(() => {
-    const status = this.socketService.jobStatus();
-    if (status === 'completed') {
-      this.showModal('success', 'Processing Complete!', 'Your PDF has been successfully converted. We have sent a confirmation to your e-mail.');
-      this.selectedFile.set(null);
-    } else if (status === 'failed') {
-      this.showModal('error', 'Processing Error', 'There was an error processing your file in the background. Please try again.');
-      this.socketService.resetJobState();
-    }
   });
 
   ngOnInit(): void {
@@ -80,23 +72,41 @@ export class UploadComponent implements OnInit, OnDestroy {
       return;
     }
     this.selectedFile.set(file);
-    this.socketService.resetJobState();
   }
 
   public upload(): void {
     const file = this.selectedFile();
     if (!file) return;
 
-    this.socketService.jobStatus.set('processing');
+    this.isUploading.set(true);
 
     this.uploadService.uploadPdf(file).subscribe({
       next: () => {
-        console.log('Upload HTTP complete. Waiting for socket events...');
+        this.isUploading.set(false);
+        this.selectedFile.set(null);
+        this.showModal(
+          'success',
+          'Upload Successful',
+          'Your file has been sent for processing. You will receive an e-mail shortly once it is ready.'
+        );
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         console.error('Upload error:', err);
-        this.socketService.resetJobState();
-        this.showModal('error', 'Server Error', 'Could not upload the file. The server might be unreachable.');
+        this.isUploading.set(false);
+
+        if (err.status === 429 && err.error?.message) {
+          this.showModal(
+            'error',
+            'Limit Exceeded',
+            err.error.message
+          );
+        } else {
+          this.showModal(
+            'error',
+            'Upload Failed',
+            'Please try again later.'
+          );
+        }
       }
     });
   }
@@ -110,6 +120,5 @@ export class UploadComponent implements OnInit, OnDestroy {
 
   public closeModal(): void {
     this.isModalOpen.set(false);
-    this.socketService.resetJobState();
   }
 }
