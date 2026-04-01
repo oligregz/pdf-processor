@@ -28,7 +28,7 @@ public class EmailService {
 	}
 
 	public void sendCompletionEmail(String toEmail, String originalFileName, String correlationId) {
-		logger.info("Preparing to send a completion HTML email to: {}", toEmail);
+		logger.info("Preparing to send a dark-themed completion HTML email to: {}", toEmail);
 
 		String baseUrl = corsOrigins.split(",")[0].trim();
 		String downloadLink = String.format("%s/download/%s", baseUrl, correlationId);
@@ -44,26 +44,30 @@ public class EmailService {
 
 			String htmlContent = String.format(
 					"<html>" +
-							"<body style='font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;'>" +
-							"  <table width='100%%' border='0' cellspacing='0' cellpadding='0'>" +
+							"<body style='font-family: \"Segoe UI\", Arial, sans-serif; background-color: #0A0A0A; margin: 0; padding: 0;'>"
+							+
+							"  <table width='100%%' border='0' cellspacing='0' cellpadding='0' style='background-color: #0A0A0A;'>" +
 							"    <tr>" +
-							"      <td align='center' style='padding: 20px 0;'>" +
-							"        <table width='600' border='0' cellspacing='0' cellpadding='0' style='background-color: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);'>"
+							"      <td align='center' style='padding: 40px 20px;'>" +
+							"        <table width='600' border='0' cellspacing='0' cellpadding='0' style='background-color: #1A1616; padding: 40px; border-radius: 12px; border: 1px solid #2d2d2d;'>"
 							+
 							"          <tr>" +
 							"            <td align='center'>" +
-							"              <h2 style='color: #333;'>Good news!</h2>" +
-							"              <p style='color: #666; font-size: 16px; line-height: 1.5;'>" +
-							"                Your PDF file <strong>%s</strong> has been successfully converted to text." +
-							"              </p>" +
-							"              <p style='color: #666; font-size: 16px; margin-bottom: 30px;'>" +
-							"                Click the button below to download your processed file:" +
-							"              </p>" +
-							"              <a href='%s' style='background-color: #007bff; color: white; padding: 15px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;'>"
+							"              <h2 style='color: #F3F4F6; font-size: 24px; margin-bottom: 10px; font-weight: bold;'>Document Ready!</h2>"
 							+
-							"                Download your file" +
+							"              <p style='color: #9CA3AF; font-size: 16px; line-height: 1.6; margin-bottom: 20px;'>" +
+							"                Your PDF file <strong style='color: #F3F4F6;'>%s</strong> has been successfully converted to text."
+							+
+							"              </p>" +
+							"              <p style='color: #9CA3AF; font-size: 16px; margin-bottom: 35px;'>" +
+							"                Click the button below to download your processed file securely." +
+							"              </p>" +
+							"              <a href='%s' style='background-color: #C81E1E; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;'>"
+							+
+							"                Download File" +
 							"              </a>" +
-							"              <p style='color: #999; font-size: 12px; margin-top: 40px;'>" +
+							"              <hr style='border: none; border-top: 1px solid #2d2d2d; margin: 40px 0 20px 0;'>" +
+							"              <p style='color: #6b7280; font-size: 12px; margin: 0;'>" +
 							"                Thank you for using PDF Processor." +
 							"              </p>" +
 							"            </td>" +
@@ -76,7 +80,7 @@ public class EmailService {
 							"</html>",
 					originalFileName, downloadLink);
 
-			helper.setText(htmlContent, true); // O 'true' indica que o conteúdo é HTML
+			helper.setText(htmlContent, true);
 
 			mailSender.send(message);
 			logger.info("HTML Email sent successfully to: {}", toEmail);

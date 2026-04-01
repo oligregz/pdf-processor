@@ -1,4 +1,14 @@
-<div class="w-full max-w-2xl bg-dark-surface border border-gray-800 rounded-2xl shadow-2xl p-8 sm:p-12 animate-in fade-in zoom-in-95 duration-500">
+<div class="absolute top-6 right-6 flex items-center gap-2 bg-dark-surface border border-gray-800 px-4 py-2 rounded-full shadow-lg animate-in slide-in-from-top-4">
+  <span class="relative flex h-3 w-3">
+    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75"></span>
+    <span class="relative inline-flex rounded-full h-3 w-3 bg-status-success"></span>
+  </span>
+  <span class="text-sm font-medium text-text-main">
+    {{ socketService.activeUsers() }} {{ socketService.activeUsers() === 1 ? 'user online' : 'users online' }}
+  </span>
+</div>
+
+<div class="w-full max-w-2xl bg-dark-surface border border-gray-800 rounded-2xl shadow-2xl p-8 sm:p-12 mt-16 animate-in fade-in zoom-in-95 duration-500">
   
   <div class="text-center mb-8">
     <h2 class="text-2xl font-bold text-text-main tracking-wide">Document Upload</h2>
@@ -32,21 +42,15 @@
       <p class="text-crimson text-xs mt-4 font-medium opacity-0 group-hover:opacity-100 transition-opacity">Click to choose a different file</p>
     }
 
-    <input 
-      type="file" 
-      #fileInput 
-      class="hidden"
-      accept="application/pdf" 
-      (change)="onFileSelected($event)" 
-    >
+    <input type="file" #fileInput class="hidden" accept="application/pdf" (change)="onFileSelected($event)">
   </div>
 
-  <div class="mt-8">
+  <div class="mt-8 animate-in fade-in slide-in-from-bottom-2">
     <app-button
       variant="primary"
       [fullWidth]="true"
+      [disabled]="!selectedFile() || isUploading()"
       [isLoading]="isUploading()"
-      [disabled]="!selectedFile()"
       (onClick)="upload()"
     >
       Process Document
@@ -59,11 +63,12 @@
   [type]="modalType()"
   [title]="modalTitle()"
   [preventCloseOnBackdrop]="false"
+  (closed)="closeModal()"
 >
   {{ modalMessage() }}
   
   <div modal-footer>
-    <app-button variant="secondary" (onClick)="isModalOpen.set(false)">
+    <app-button variant="secondary" (onClick)="closeModal()">
       Close
     </app-button>
   </div>

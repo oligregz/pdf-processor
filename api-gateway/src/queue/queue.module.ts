@@ -3,6 +3,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { QueueService } from './queue.service';
 import { RabbitMQ } from './rabbitmq.constants';
+import { QueueController } from './queue.controller';
+import { EventsModule } from 'src/events/events.module';
 
 @Module({
   imports: [
@@ -24,8 +26,10 @@ import { RabbitMQ } from './rabbitmq.constants';
         }),
       },
     ]),
+    EventsModule,
   ],
   providers: [QueueService],
   exports: [QueueService],
+  controllers: [QueueController],
 })
 export class QueueModule {}
