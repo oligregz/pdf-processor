@@ -5,3 +5,8 @@ export interface IPdfUploadedEventPayload {
   originalFileName: string;
   storagePath: string;
 }
+
+export interface IPdfProcessedPayload {
+  correlationId: string;
+  userId: string;
+}
