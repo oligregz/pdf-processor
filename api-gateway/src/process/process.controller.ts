@@ -34,6 +34,8 @@ import { EventsGateway } from '../events/events.gateway';
 export class ProcessController {
   private readonly logger = new Logger(ProcessController.name);
 
+  private readonly downloadCounts = new Map<string, number>();
+
   constructor(
     private readonly processService: ProcessService,
     private readonly storageService: StorageService,
@@ -77,9 +79,25 @@ export class ProcessController {
     @Param('correlationId') correlationId: string,
     @Res() res: Response,
   ) {
+    const currentDownloads = this.downloadCounts.get(correlationId) || 0;
+
+    if (currentDownloads >= 3) {
+      this.logger.warn(`Download limit exceeded for file: ${correlationId}`);
+      res.status(HttpStatus.TOO_MANY_REQUESTS).json({
+        message:
+          'Download limit exceeded. A maximum of 3 downloads per file is allowed for security reasons.',
+      });
+      return;
+    }
+
     try {
       const fileKey = `pdfs/${correlationId}.txt`;
       const fileStream = await this.storageService.getFileStream(fileKey);
+
+      this.downloadCounts.set(correlationId, currentDownloads + 1);
+      this.logger.log(
+        `File ${correlationId} downloaded. Count: ${currentDownloads + 1}/3`,
+      );
 
       res.set({
         'Content-Type': 'text/plain',
