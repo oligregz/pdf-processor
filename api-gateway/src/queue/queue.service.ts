@@ -1,6 +1,6 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { IPdfUploadedEventPayload } from 'src/common/interafces/queue.interface';
+import { IPdfUploadedEventPayload } from 'src/common/interfaces/queue.interface';
 @Injectable()
 export class QueueService {
   private readonly logger = new Logger(QueueService.name);

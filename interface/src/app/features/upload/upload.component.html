@@ -1,35 +1,75 @@
-<div class="upload-container">
-  <h2>Send PDF for Processing</h2>
+<div class="absolute top-6 right-6 flex items-center gap-2 bg-dark-surface border border-gray-800 px-4 py-2 rounded-full shadow-lg animate-in slide-in-from-top-4">
+  <span class="relative flex h-3 w-3">
+    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75"></span>
+    <span class="relative inline-flex rounded-full h-3 w-3 bg-status-success"></span>
+  </span>
+  <span class="text-sm font-medium text-text-main">
+    {{ socketService.activeUsers() }} {{ socketService.activeUsers() === 1 ? 'user online' : 'users online' }}
+  </span>
+</div>
+
+<div class="w-full max-w-2xl bg-dark-surface border border-gray-800 rounded-2xl shadow-2xl p-8 sm:p-12 mt-16 animate-in fade-in zoom-in-95 duration-500">
   
+  <div class="text-center mb-8">
+    <h2 class="text-2xl font-bold text-text-main tracking-wide">Document Upload</h2>
+    <p class="text-text-muted mt-2 text-sm">Select or drag a PDF file to begin the conversion process.</p>
+  </div>
+
   <div 
-    class="dropzone" 
-    [class.active]="isDragging"
+    class="relative border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group"
+    [class]="isDragging() ? 'border-crimson bg-crimson/10' : 'border-gray-700 hover:border-crimson/50 hover:bg-gray-800/30'"
     (dragover)="onDragOver($event)"
     (dragleave)="onDragLeave($event)"
     (drop)="onDrop($event)"
     (click)="fileInput.click()"
   >
-    <p *ngIf="!selectedFile">Drag and drop your PDF here or click to select.</p>
-    <p *ngIf="selectedFile" class="file-name">File ready: <strong>{{ selectedFile.name }}</strong></p>
-    
-    <input 
-      type="file" 
-      #fileInput 
-      accept="application/pdf" 
-      (change)="onFileSelected($event)" 
-      style="display: none;"
+    <div 
+      class="w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-colors"
+      [class]="selectedFile() ? 'bg-crimson/20 text-crimson' : 'bg-gray-800 text-text-muted group-hover:text-text-main'"
     >
+      <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    </div>
+
+    @if (!selectedFile()) {
+      <p class="text-text-main font-medium text-lg">Click to upload or drag and drop</p>
+      <p class="text-text-muted text-sm mt-1">Only PDF files are supported</p>
+    } @else {
+      <p class="text-status-success font-medium text-lg">File ready for processing</p>
+      <p class="text-text-main font-semibold mt-2">{{ selectedFile()?.name }}</p>
+      <p class="text-text-muted text-sm mt-1">{{ formattedFileSize() }}</p>
+      <p class="text-crimson text-xs mt-4 font-medium opacity-0 group-hover:opacity-100 transition-opacity">Click to choose a different file</p>
+    }
+
+    <input type="file" #fileInput class="hidden" accept="application/pdf" (change)="onFileSelected($event)">
   </div>
 
-  <div class="status-message" *ngIf="message">
-    {{ message }}
+  <div class="mt-8 animate-in fade-in slide-in-from-bottom-2">
+    <app-button
+      variant="primary"
+      [fullWidth]="true"
+      [disabled]="!selectedFile() || isUploading()"
+      [isLoading]="isUploading()"
+      (onClick)="upload()"
+    >
+      Process Document
+    </app-button>
   </div>
-
-  <button 
-    (click)="upload()" 
-    [disabled]="!selectedFile || isUploading"
-    class="btn-upload"
-  >
-    {{ isUploading ? 'Sending...' : 'Process file' }}
-  </button>
 </div>
+
+<app-modal
+  [(isOpen)]="isModalOpen"
+  [type]="modalType()"
+  [title]="modalTitle()"
+  [preventCloseOnBackdrop]="false"
+  (closed)="closeModal()"
+>
+  {{ modalMessage() }}
+  
+  <div modal-footer>
+    <app-button variant="secondary" (onClick)="closeModal()">
+      Close
+    </app-button>
+  </div>
+</app-modal>

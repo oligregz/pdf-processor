@@ -1,44 +1,43 @@
-<div class="login-container">
-  <div class="login-card">
-    <h2>PDF Processor</h2>
-    <p>Log in to convert your files.</p>
-
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      
-      <div class="form-group">
-        <label for="email">E-mail</label>
-        <input 
-          id="email" 
-          type="email" 
-          formControlName="email" 
-          placeholder="seu@email.com"
-        >
-        <div class="error" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid">
-          Invalid E-mail.
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input 
-          id="password" 
-          type="password" 
-          formControlName="password" 
-          placeholder="******"
-        >
-        <div class="error" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
-          The password must be at least 6 characters long.
-        </div>
-      </div>
-
-      <div class="error-banner" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
-
-      <button type="submit" [disabled]="loginForm.invalid || isLoading">
-        {{ isLoading ? 'Entering...' : 'Login' }}
-      </button>
-
-    </form>
+<div class="w-full max-w-md bg-dark-surface border border-gray-800 rounded-2xl shadow-2xl p-8 sm:p-10 animate-in fade-in zoom-in-95 duration-500">
+  
+  <div class="flex flex-col items-center mb-8">
+    <div class="w-16 h-16 bg-crimson/10 text-crimson rounded-2xl flex items-center justify-center mb-5 border border-crimson/20">
+      <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    </div>
+    <h2 class="text-2xl font-bold text-text-main tracking-wide">PDF Processor</h2>
+    <p class="text-text-muted mt-2 text-center text-sm leading-relaxed">
+      Enter your e-mail to authenticate and access the file conversion platform.
+    </p>
   </div>
+
+  <form (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+    
+    <app-input
+      type="email"
+      label="E-mail Address"
+      placeholder="developer@example.com"
+      [(value)]="email"
+      [errorMessage]="emailError()"
+      [disabled]="isLoading()"
+    ></app-input>
+
+    @if (errorMessage()) {
+      <div class="p-3 bg-status-error/10 border border-status-error/20 rounded-lg text-status-error text-sm text-center animate-in slide-in-from-top-2">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <app-button
+      type="submit"
+      variant="primary"
+      [fullWidth]="true"
+      [isLoading]="isLoading()"
+      [disabled]="email().length === 0 || !isEmailValid()"
+    >
+      Sign In
+    </app-button>
+
+  </form>
 </div>

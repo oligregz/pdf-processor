@@ -1,0 +1,68 @@
+@if (isOpen()) {
+  <div 
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 transition-opacity"
+    (click)="handleBackdropClick()"
+    aria-labelledby="modal-title" 
+    role="dialog" 
+    aria-modal="true"
+  >
+    <div 
+      class="relative w-full max-w-md bg-dark-surface border border-gray-800 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
+      (click)="handleModalClick($event)"
+    >
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+        <div class="flex items-center gap-3">
+          <span [class]="iconColorClass()">
+            @switch (type()) {
+              @case ('success') {
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+              }
+              @case ('error') {
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              }
+              @case ('warning') {
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              }
+              @default {
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              }
+            }
+          </span>
+          
+          @if (title()) {
+            <h3 id="modal-title" class="text-lg font-semibold text-text-main tracking-wide">
+              {{ title() }}
+            </h3>
+          }
+        </div>
+
+        <button 
+          type="button" 
+          class="text-text-muted hover:text-text-main transition-colors focus:outline-none focus:ring-2 focus:ring-crimson rounded-md"
+          (click)="closeModal()"
+          aria-label="Fechar modal"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="px-6 py-5 text-text-muted text-sm leading-relaxed">
+        <ng-content></ng-content>
+      </div>
+
+      <div class="px-6 py-4 border-t border-gray-800 bg-black/20 flex justify-end gap-3">
+        <ng-content select="[modal-footer]"></ng-content>
+      </div>
+    </div>
+  </div>
+}

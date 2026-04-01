@@ -1,49 +1,57 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms'; 
+
 import { AuthService } from '../auth';
+import { InputComponent } from '../../../shared/components/input/input.component';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { ILoginRequest } from '../../../shared/common/types/auth.type';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  imports: [InputComponent, ButtonComponent, FormsModule], 
+  templateUrl: './login.component.html'
 })
 export class LoginComponent {
-  loginForm: FormGroup;
-  isLoading = false;
-  errorMessage = '';
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
-  }
+  public email = signal<string>('');
+  public isLoading = signal<boolean>(false);
+  public errorMessage = signal<string | null>(null);
 
-  onSubmit() {
-    if (this.loginForm.invalid) {
-      return;
+  public isEmailValid = computed<boolean>(() => {
+    const emailValue = this.email();
+    if (emailValue.length === 0) return false;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(emailValue);
+  });
+
+  public emailError = computed<string | null>(() => {
+    if (this.email().length > 0 && !this.isEmailValid()) {
+      return 'Invalid e-mail format.';
     }
+    return null;
+  });
 
-    this.isLoading = true;
-    this.errorMessage = '';
-    
-    this.authService.login(this.loginForm.value).subscribe({
-      next: (res) => {
-        this.isLoading = false;
+  public onSubmit(): void {
+    if (!this.isEmailValid()) return;
+
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    const payload: ILoginRequest = { email: this.email() };
+
+    this.authService.login(payload).subscribe({
+      next: () => {
+        this.isLoading.set(false);
         this.router.navigate(['/upload']);
       },
       error: (err) => {
-        this.isLoading = false;
         console.error('Login error:', err);
-        this.errorMessage = 'Incorect credentials';
+        this.isLoading.set(false);
+        this.errorMessage.set('Authentication failed. Please verify your e-mail.');
       }
     });
   }
