@@ -24,7 +24,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { FileUploadDto } from 'src/common/dtos/file-upload.dto';
-import type { IAuthenticatedRequest } from 'src/common/interafces/process.interface';
+import type { IAuthenticatedRequest } from 'src/common/interfaces/process.interface';
 import { ApiDownloadDocs } from 'src/common/decorators/download-docs.decorator';
 import { StorageService } from 'src/storage/storage.service';
 import { EventsGateway } from '../events/events.gateway';

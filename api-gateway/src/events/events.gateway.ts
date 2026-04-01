@@ -8,7 +8,7 @@ import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
-import { IPayloadJWT } from '../common/interafces/payload.interface';
+import { IPayloadJWT } from '../common/interfaces/payload.interface';
 
 @WebSocketGateway({
   transports: ['websocket'],
